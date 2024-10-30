@@ -7516,4 +7516,6 @@ declare module "@scom/scom-code-editor" {
     export { ScomCodeEditor } from "@scom/scom-code-editor/code-editor.ts";
     export { ScomCodeDiffEditor } from "@scom/scom-code-editor/diff-editor.ts";
     export { LanguageType } from "@scom/scom-code-editor/monaco.ts";
+    import * as Monaco from "@scom/scom-code-editor/editor.api.ts";
+    export { Monaco };
 }

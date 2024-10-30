@@ -956,10 +956,11 @@ define("@scom/scom-code-editor/diff-editor.ts", ["require", "exports", "@ijstech
     exports.ScomCodeDiffEditor = ScomCodeDiffEditor;
     ;
 });
-define("@scom/scom-code-editor", ["require", "exports", "@scom/scom-code-editor/code-editor.ts", "@scom/scom-code-editor/diff-editor.ts"], function (require, exports, code_editor_1, diff_editor_1) {
+define("@scom/scom-code-editor", ["require", "exports", "@scom/scom-code-editor/code-editor.ts", "@scom/scom-code-editor/diff-editor.ts", "@scom/scom-code-editor/editor.api.ts"], function (require, exports, code_editor_1, diff_editor_1, Monaco) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.ScomCodeDiffEditor = exports.ScomCodeEditor = void 0;
+    exports.Monaco = exports.ScomCodeDiffEditor = exports.ScomCodeEditor = void 0;
     Object.defineProperty(exports, "ScomCodeEditor", { enumerable: true, get: function () { return code_editor_1.ScomCodeEditor; } });
     Object.defineProperty(exports, "ScomCodeDiffEditor", { enumerable: true, get: function () { return diff_editor_1.ScomCodeDiffEditor; } });
+    exports.Monaco = Monaco;
 });
