@@ -335,6 +335,7 @@ define("@scom/scom-code-editor/monaco.ts", ["require", "exports", "@ijstech/comp
     }
     exports.addLib = addLib;
     ;
+    const path = components_1.application.currentModuleDir;
     async function initMonaco() {
         if (window.monaco)
             return window.monaco;
@@ -356,7 +357,7 @@ define("@scom/scom-code-editor/monaco.ts", ["require", "exports", "@ijstech/comp
             //   }
             // }
             };
-            components_1.RequireJS.config({ paths: { 'vs': `${components_1.LibPath}lib/monaco-editor/0.32.1/min/vs` } });
+            components_1.RequireJS.config({ paths: { 'vs': `${path}/lib/monaco-editor/0.32.1/min/vs` } });
             components_1.RequireJS.require([`vs/editor/editor.main`], (monaco) => {
                 resolve(monaco);
                 if (monaco.$loaded)

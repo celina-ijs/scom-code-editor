@@ -1,4 +1,4 @@
-import { RequireJS, LibPath } from "@ijstech/components";
+import { RequireJS, LibPath, application } from "@ijstech/components";
 import * as IMonaco from "./editor.api";
 
 export type LanguageType = "txt" | "css" | "json" | "javascript" | "typescript" | "solidity" | "markdown" | "html" | "xml" | "shell";
@@ -91,6 +91,8 @@ export async function addLib(lib: string, dts: string) {
   monaco.languages.typescript.typescriptDefaults.addExtraLib(dts, lib);
 };
 
+const path = application.currentModuleDir;
+
 export async function initMonaco(): Promise<Monaco> {
   if ((window as any).monaco)
     return (window as any).monaco;
@@ -112,7 +114,7 @@ export async function initMonaco(): Promise<Monaco> {
       //   }
       // }
     };
-    RequireJS.config({ paths: { 'vs': `${LibPath}lib/monaco-editor/0.32.1/min/vs` } });
+    RequireJS.config({ paths: { 'vs': `${path}/lib/monaco-editor/0.32.1/min/vs` } });
     RequireJS.require([`vs/editor/editor.main`], (monaco: Monaco) => {
       resolve(monaco);
       if (monaco.$loaded)
