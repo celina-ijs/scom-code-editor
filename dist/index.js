@@ -357,7 +357,7 @@ define("@scom/scom-code-editor/monaco.ts", ["require", "exports", "@ijstech/comp
             //   }
             // }
             };
-            components_1.RequireJS.config({ paths: { 'vs': `${path}/lib/monaco-editor/0.32.1/min/vs` } });
+            components_1.RequireJS.config({ paths: { 'vs': `${path || ''}/lib/monaco-editor/0.32.1/min/vs` } });
             components_1.RequireJS.require([`vs/editor/editor.main`], (monaco) => {
                 resolve(monaco);
                 if (monaco.$loaded)
@@ -548,6 +548,14 @@ define("@scom/scom-code-editor/code-editor.ts", ["require", "exports", "@ijstech
             if (this.editor)
                 this.editor.updateOptions({ ...this.editor.getOptions(), readOnly: value });
         }
+        get theme() {
+            return this._theme || 'dark';
+        }
+        set theme(value) {
+            this._theme = value || 'dark';
+            const themeVal = value === 'light' ? 'vs' : 'vs-dark';
+            this.monaco.editor.setTheme(themeVal);
+        }
         async init() {
             super.init();
             const language = this.getAttribute("language", true);
@@ -584,7 +592,7 @@ define("@scom/scom-code-editor/code-editor.ts", ["require", "exports", "@ijstech
                 captionDiv.style.width = "100%";
                 const customOptions = this._options || {};
                 let options = {
-                    theme: "vs-dark",
+                    theme: this.theme === 'light' ? 'vs' : 'vs-dark',
                     tabSize: 2,
                     autoIndent: 'advanced',
                     formatOnPaste: true,

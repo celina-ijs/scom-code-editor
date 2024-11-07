@@ -7401,6 +7401,7 @@ declare module "@scom/scom-code-editor/code-editor.ts" {
     type onChangeCallback = (target: ScomCodeEditor, event: Event) => void;
     type onKeyEventCallback = (target: ScomCodeEditor, event: KeyboardEvent) => void;
     export interface ScomCodeEditorElement extends ControlElement {
+        theme?: 'light' | 'dark';
         language?: LanguageType;
         onChange?: onChangeCallback;
         onKeyDown?: onKeyEventCallback;
@@ -7419,6 +7420,7 @@ declare module "@scom/scom-code-editor/code-editor.ts" {
         private _language;
         private _fileName;
         private _value;
+        private _theme;
         private _options;
         onChange: onChangeCallback;
         onKeyDown: onKeyEventCallback;
@@ -7436,6 +7438,8 @@ declare module "@scom/scom-code-editor/code-editor.ts" {
         set language(value: LanguageType);
         get designMode(): boolean;
         set designMode(value: boolean);
+        get theme(): 'light' | 'dark';
+        set theme(value: 'light' | 'dark');
         init(): Promise<void>;
         focus(): void;
         setCursor(line: number, column: number): void;

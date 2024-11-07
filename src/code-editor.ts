@@ -7,6 +7,7 @@ type onChangeCallback = (target: ScomCodeEditor, event: Event) => void;
 type onKeyEventCallback = (target: ScomCodeEditor, event: KeyboardEvent) => void;
 
 export interface ScomCodeEditorElement extends ControlElement {
+  theme?: 'light' | 'dark';
   language?: LanguageType;
   onChange?: onChangeCallback;
   onKeyDown?: onKeyEventCallback;
@@ -27,6 +28,7 @@ export class ScomCodeEditor extends Control {
   private _language: LanguageType;
   private _fileName: string;
   private _value: string;
+  private _theme: 'light' | 'dark';
   private _options: IMonaco.editor.IEditorOptions;
   public onChange: onChangeCallback;
   public onKeyDown: onKeyEventCallback;
@@ -87,6 +89,15 @@ export class ScomCodeEditor extends Control {
       this.editor.updateOptions({ ...this.editor.getOptions(), readOnly: value });
   }
 
+  get theme() {
+    return this._theme || 'dark';
+  }
+  set theme(value: 'light' | 'dark') {
+    this._theme = value || 'dark';
+    const themeVal = value === 'light' ? 'vs' : 'vs-dark';
+    this.monaco.editor.setTheme(themeVal);
+  }
+
   async init() {
     super.init();
     const language = this.getAttribute("language", true);
@@ -125,7 +136,7 @@ export class ScomCodeEditor extends Control {
       captionDiv.style.width = "100%";
       const customOptions = this._options || {};
       let options: IMonaco.editor.IStandaloneEditorConstructionOptions = {
-        theme: "vs-dark",
+        theme: this.theme === 'light' ? 'vs' : 'vs-dark',
         tabSize: 2,
         autoIndent: 'advanced',
         formatOnPaste: true,
