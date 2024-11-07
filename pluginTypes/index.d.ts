@@ -7392,15 +7392,25 @@ declare module "@scom/scom-code-editor/monaco.ts" {
 }
 /// <amd-module name="@scom/scom-code-editor/index.css.ts" />
 declare module "@scom/scom-code-editor/index.css.ts" { }
+/// <amd-module name="@scom/scom-code-editor/interface.ts" />
+declare module "@scom/scom-code-editor/interface.ts" {
+    export enum EditorType {
+        'modified' = 0,
+        'original' = 1
+    }
+    export type ThemeType = 'light' | 'dark';
+}
 /// <amd-module name="@scom/scom-code-editor/code-editor.ts" />
 declare module "@scom/scom-code-editor/code-editor.ts" {
     import { Control, ControlElement } from "@ijstech/components";
     import { addLib, addFile, getFileModel, updateFile, LanguageType, Monaco } from "@scom/scom-code-editor/monaco.ts";
     import * as IMonaco from "@scom/scom-code-editor/editor.api.ts";
     import "@scom/scom-code-editor/index.css.ts";
+    import { ThemeType } from "@scom/scom-code-editor/interface.ts";
     type onChangeCallback = (target: ScomCodeEditor, event: Event) => void;
     type onKeyEventCallback = (target: ScomCodeEditor, event: KeyboardEvent) => void;
     export interface ScomCodeEditorElement extends ControlElement {
+        theme?: ThemeType;
         language?: LanguageType;
         onChange?: onChangeCallback;
         onKeyDown?: onKeyEventCallback;
@@ -7419,6 +7429,7 @@ declare module "@scom/scom-code-editor/code-editor.ts" {
         private _language;
         private _fileName;
         private _value;
+        private _theme;
         private _options;
         onChange: onChangeCallback;
         onKeyDown: onKeyEventCallback;
@@ -7436,6 +7447,8 @@ declare module "@scom/scom-code-editor/code-editor.ts" {
         set language(value: LanguageType);
         get designMode(): boolean;
         set designMode(value: boolean);
+        get theme(): ThemeType;
+        set theme(value: ThemeType);
         init(): Promise<void>;
         focus(): void;
         setCursor(line: number, column: number): void;
@@ -7451,13 +7464,6 @@ declare module "@scom/scom-code-editor/code-editor.ts" {
         updateOptions(options: IMonaco.editor.IEditorOptions): void;
     }
 }
-/// <amd-module name="@scom/scom-code-editor/interface.ts" />
-declare module "@scom/scom-code-editor/interface.ts" {
-    export enum EditorType {
-        'modified' = 0,
-        'original' = 1
-    }
-}
 /// <amd-module name="@scom/scom-code-editor/diff-editor.ts" />
 declare module "@scom/scom-code-editor/diff-editor.ts" {
     import { Control } from "@ijstech/components";
@@ -7465,7 +7471,7 @@ declare module "@scom/scom-code-editor/diff-editor.ts" {
     import { ScomCodeEditorElement } from "@scom/scom-code-editor/code-editor.ts";
     import * as IMonaco from "@scom/scom-code-editor/editor.api.ts";
     import "@scom/scom-code-editor/index.css.ts";
-    import { EditorType } from "@scom/scom-code-editor/interface.ts";
+    import { EditorType, ThemeType } from "@scom/scom-code-editor/interface.ts";
     export interface ScomCodeDiffEditorElement extends ScomCodeEditorElement {
         renderSideBySide?: boolean;
     }
@@ -7482,6 +7488,7 @@ declare module "@scom/scom-code-editor/diff-editor.ts" {
         private _modifiedModel;
         private _language;
         private _fileName;
+        private _theme;
         private _originalValue;
         private _modifiedValue;
         private _renderSideBySide;
@@ -7500,6 +7507,8 @@ declare module "@scom/scom-code-editor/diff-editor.ts" {
         get designMode(): boolean;
         set designMode(value: boolean);
         get monaco(): Monaco;
+        get theme(): ThemeType;
+        set theme(value: ThemeType);
         init(): void;
         setModelLanguage(value: LanguageType, functionName: 'getModifiedEditor' | 'getOriginalEditor'): void;
         dispose(): void;

@@ -114,7 +114,7 @@ export async function initMonaco(): Promise<Monaco> {
       //   }
       // }
     };
-    RequireJS.config({ paths: { 'vs': `${path}/lib/monaco-editor/0.32.1/min/vs` } });
+    RequireJS.config({ paths: { 'vs': `${path || ''}/lib/monaco-editor/0.32.1/min/vs` } });
     RequireJS.require([`vs/editor/editor.main`], (monaco: Monaco) => {
       resolve(monaco);
       if (monaco.$loaded)
