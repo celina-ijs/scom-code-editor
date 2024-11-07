@@ -2,12 +2,13 @@ import { Control, customElements, ControlElement } from "@ijstech/components";
 import { addLib, addFile, getFileModel, updateFile, LanguageType, initMonaco, Monaco } from "./monaco";
 import * as IMonaco from "./editor.api";
 import "./index.css";
+import { ThemeType } from "./interface";
 
 type onChangeCallback = (target: ScomCodeEditor, event: Event) => void;
 type onKeyEventCallback = (target: ScomCodeEditor, event: KeyboardEvent) => void;
 
 export interface ScomCodeEditorElement extends ControlElement {
-  theme?: 'light' | 'dark';
+  theme?: ThemeType;
   language?: LanguageType;
   onChange?: onChangeCallback;
   onKeyDown?: onKeyEventCallback;
@@ -28,7 +29,7 @@ export class ScomCodeEditor extends Control {
   private _language: LanguageType;
   private _fileName: string;
   private _value: string;
-  private _theme: 'light' | 'dark';
+  private _theme: ThemeType;
   private _options: IMonaco.editor.IEditorOptions;
   public onChange: onChangeCallback;
   public onKeyDown: onKeyEventCallback;
@@ -92,16 +93,18 @@ export class ScomCodeEditor extends Control {
   get theme() {
     return this._theme || 'dark';
   }
-  set theme(value: 'light' | 'dark') {
+  set theme(value: ThemeType) {
     this._theme = value || 'dark';
     const themeVal = value === 'light' ? 'vs' : 'vs-dark';
-    this.monaco.editor.setTheme(themeVal);
+    this.monaco?.editor?.setTheme(themeVal);
   }
 
   async init() {
     super.init();
     const language = this.getAttribute("language", true);
     if (language) this.language = language;
+    const theme = this.getAttribute("theme", true);
+    if (theme) this.theme = theme;
     this.style.display = "inline-block";
     if (this.language)
       await this.loadContent(undefined, this.language);

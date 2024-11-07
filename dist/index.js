@@ -491,6 +491,17 @@ define("@scom/scom-code-editor/index.css.ts", ["require", "exports", "@ijstech/c
         },
     });
 });
+define("@scom/scom-code-editor/interface.ts", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.EditorType = void 0;
+    ///<amd-module name='@scom/scom-code-editor/interface.ts'/> 
+    var EditorType;
+    (function (EditorType) {
+        EditorType[EditorType["modified"] = 0] = "modified";
+        EditorType[EditorType["original"] = 1] = "original";
+    })(EditorType = exports.EditorType || (exports.EditorType = {}));
+});
 define("@scom/scom-code-editor/code-editor.ts", ["require", "exports", "@ijstech/components", "@scom/scom-code-editor/monaco.ts", "@scom/scom-code-editor/index.css.ts"], function (require, exports, components_3, monaco_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -554,13 +565,16 @@ define("@scom/scom-code-editor/code-editor.ts", ["require", "exports", "@ijstech
         set theme(value) {
             this._theme = value || 'dark';
             const themeVal = value === 'light' ? 'vs' : 'vs-dark';
-            this.monaco.editor.setTheme(themeVal);
+            this.monaco?.editor?.setTheme(themeVal);
         }
         async init() {
             super.init();
             const language = this.getAttribute("language", true);
             if (language)
                 this.language = language;
+            const theme = this.getAttribute("theme", true);
+            if (theme)
+                this.theme = theme;
             this.style.display = "inline-block";
             if (this.language)
                 await this.loadContent(undefined, this.language);
@@ -750,17 +764,6 @@ define("@scom/scom-code-editor/code-editor.ts", ["require", "exports", "@ijstech
     exports.ScomCodeEditor = ScomCodeEditor;
     ;
 });
-define("@scom/scom-code-editor/interface.ts", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.EditorType = void 0;
-    ///<amd-module name='@scom/scom-code-editor/interface.ts'/> 
-    var EditorType;
-    (function (EditorType) {
-        EditorType[EditorType["modified"] = 0] = "modified";
-        EditorType[EditorType["original"] = 1] = "original";
-    })(EditorType = exports.EditorType || (exports.EditorType = {}));
-});
 define("@scom/scom-code-editor/diff-editor.ts", ["require", "exports", "@ijstech/components", "@scom/scom-code-editor/monaco.ts", "@scom/scom-code-editor/interface.ts", "@scom/scom-code-editor/index.css.ts"], function (require, exports, components_4, monaco_2, interface_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -838,9 +841,20 @@ define("@scom/scom-code-editor/diff-editor.ts", ["require", "exports", "@ijstech
         get monaco() {
             return window.monaco;
         }
+        get theme() {
+            return this._theme || 'dark';
+        }
+        set theme(value) {
+            this._theme = value || 'dark';
+            const themeVal = value === 'light' ? 'vs' : 'vs-dark';
+            this.monaco?.editor?.setTheme(themeVal);
+        }
         init() {
             super.init();
             this.language = this.getAttribute("language", true);
+            const theme = this.getAttribute("theme", true);
+            if (theme)
+                this.theme = theme;
             this._renderSideBySide = this.getAttribute("renderSideBySide", true, true);
             this.style.display = "inline-block";
         }
@@ -894,7 +908,7 @@ define("@scom/scom-code-editor/diff-editor.ts", ["require", "exports", "@ijstech
                 captionDiv.style.height = "100%";
                 captionDiv.style.width = "100%";
                 let options = {
-                    theme: "vs-dark",
+                    theme: this.theme === 'light' ? 'vs' : 'vs-dark',
                     originalEditable: false,
                     automaticLayout: true,
                     readOnly: this._designMode,

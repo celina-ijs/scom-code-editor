@@ -3,7 +3,7 @@ import { addLib, addFile, getFileModel, updateFile, LanguageType, initMonaco, Mo
 import { ScomCodeEditorElement } from "./code-editor";
 import * as IMonaco from "./editor.api";
 import "./index.css";
-import { EditorType } from "./interface";
+import { EditorType, ThemeType } from "./interface";
 
 export interface ScomCodeDiffEditorElement extends ScomCodeEditorElement {
   renderSideBySide?: boolean;
@@ -24,6 +24,7 @@ export class ScomCodeDiffEditor extends Control {
   private _modifiedModel: IMonaco.editor.ITextModel | undefined;
   private _language: LanguageType;
   private _fileName: string;
+  private _theme: ThemeType;
   private _originalValue: string;
   private _modifiedValue: string;
   private _renderSideBySide: boolean = true;
@@ -98,9 +99,20 @@ export class ScomCodeDiffEditor extends Control {
     return (window as any).monaco as Monaco;
   }
 
+  get theme() {
+    return this._theme || 'dark';
+  }
+  set theme(value: ThemeType) {
+    this._theme = value || 'dark';
+    const themeVal = value === 'light' ? 'vs' : 'vs-dark';
+    this.monaco?.editor?.setTheme(themeVal);
+  }
+
   init() {
     super.init();
     this.language = this.getAttribute("language", true);
+    const theme = this.getAttribute("theme", true);
+    if (theme) this.theme = theme;
     this._renderSideBySide = this.getAttribute("renderSideBySide", true, true);
     this.style.display = "inline-block";
   };
@@ -163,7 +175,7 @@ export class ScomCodeDiffEditor extends Control {
       captionDiv.style.height = "100%";
       captionDiv.style.width = "100%";
       let options: IMonaco.editor.IStandaloneDiffEditorConstructionOptions = {
-        theme: "vs-dark",
+        theme: this.theme === 'light' ? 'vs' : 'vs-dark',
         originalEditable: false,
         automaticLayout: true,
         readOnly: this._designMode,
