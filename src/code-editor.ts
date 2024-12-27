@@ -207,6 +207,7 @@ export class ScomCodeEditor extends Control {
           model = monaco.editor.createModel(content || this._value || '', "typescript", monaco.Uri.file(fileName));
         }
         this._editor.setModel(model);
+        this._editor.setValue(content);
       }
       else {
         this._editor.setValue(content);

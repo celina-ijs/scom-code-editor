@@ -676,6 +676,7 @@ define("@scom/scom-code-editor/code-editor.ts", ["require", "exports", "@ijstech
                         model = monaco.editor.createModel(content || this._value || '', "typescript", monaco.Uri.file(fileName));
                     }
                     this._editor.setModel(model);
+                    this._editor.setValue(content);
                 }
                 else {
                     this._editor.setValue(content);
