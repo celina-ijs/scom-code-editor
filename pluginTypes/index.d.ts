@@ -7374,7 +7374,7 @@ declare module "@scom/scom-code-editor/editor.api.ts" {
 /// <amd-module name="@scom/scom-code-editor/monaco.ts" />
 declare module "@scom/scom-code-editor/monaco.ts" {
     import * as IMonaco from "@scom/scom-code-editor/editor.api.ts";
-    export type LanguageType = "txt" | "css" | "json" | "javascript" | "typescript" | "solidity" | "markdown" | "html" | "xml" | "shell";
+    export type LanguageType = "txt" | "css" | "json" | "javascript" | "typescript" | "solidity" | "markdown" | "html" | "xml" | "shell" | 'tact';
     export function getLanguageType(fileName: string): LanguageType | undefined;
     export interface Monaco {
         MarkerSeverity: typeof IMonaco.MarkerSeverity;

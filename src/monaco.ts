@@ -1,7 +1,7 @@
 import { RequireJS, LibPath, application } from "@ijstech/components";
 import * as IMonaco from "./editor.api";
 
-export type LanguageType = "txt" | "css" | "json" | "javascript" | "typescript" | "solidity" | "markdown" | "html" | "xml" | "shell";
+export type LanguageType = "txt" | "css" | "json" | "javascript" | "typescript" | "solidity" | "markdown" | "html" | "xml" | "shell"|'tact';
 
 export function getLanguageType(fileName: string): LanguageType | undefined {
   let ext = fileName.split('.').pop();
@@ -28,6 +28,8 @@ export function getLanguageType(fileName: string): LanguageType | undefined {
       return 'xml'
     case 'sh':
       return 'shell'
+    case 'tact':
+      return 'tact'
   }
 };
 
@@ -166,6 +168,95 @@ export async function initMonaco(): Promise<Monaco> {
           };
         }
       });
+
+      monaco.languages.register({
+        id: "tact"
+      });
+
+      monaco.languages.setMonarchTokensProvider('tact', {
+        keywords: [
+          "import", "const", "let", "as", "is", "in", "self", "require", "send", "this",
+          "if", "else", "try", "catch", "repeat", "do", "until", "while", "foreach",
+          "return", "struct", "message", "trait", "contract", "native", "inline", "with",
+          "inline_ref", "extend", "public", "abstract", "virtual", "override", "get", "asm",
+          "mutates", "extends", "fun", "init", "receive", "bounced", "external", "primitive"
+        ],
+        typeKeywords: [
+          'Int', 'Bool', 'Address', 'Cell', 'String', 'StringBuilder', 'Builder', 'Slice'
+        ],
+        tokenizer: {
+          root: [
+            [/[a-z_$][\w$]*/, { cases: { '@typeKeywords': 'keyword', '@keywords': 'keyword', '@default': 'identifier' } }],
+            [/[A-Z][\w\$]*/, 'type.identifier' ],
+            [/\b\d+(\.\d+)?\b/, 'number'],
+            [/"/, { token: 'string.quote', next: '@string' }],
+            [/\/\/.*/, 'comment'],
+            [/[a-zA-Z_][a-zA-Z0-9_]*(?=\s*\()/, 'function']
+          ],
+          string: [
+            [/[^"]+/, 'string'],
+            [/"/, { token: 'string.quote', next: '@pop' }]
+          ]
+        }
+      })
+
+      monaco.languages.setLanguageConfiguration('tact', {
+        comments: {
+          lineComment: '//',
+        },
+        brackets: [
+          ['{', '}'],
+          ['[', ']'],
+          ['(', ')'],
+        ],
+        autoClosingPairs: [
+          { open: '{', close: '}' },
+          { open: '[', close: ']' },
+          { open: '(', close: ')' },
+          { open: '"', close: '"' },
+        ],
+        surroundingPairs: [
+          { open: '{', close: '}' },
+          { open: '[', close: ']' },
+          { open: '(', close: ')' },
+          { open: '"', close: '"' },
+        ],
+      });
+
+      monaco.languages.registerCompletionItemProvider('tact', {
+        provideCompletionItems: (model: any, position: any) => {
+          const word = model.getWordUntilPosition(position);
+          const suggestions = [
+            {
+              label: 'fun',
+              kind: monaco.languages.CompletionItemKind.Keyword,
+              insertText: 'fun ${1:name}(${2:args}) {\n\t$0\n}',
+              insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+              documentation: 'Defines a function.',
+              range: {
+                startLineNumber: position.lineNumber,
+                endLineNumber: position.lineNumber,
+                startColumn: word.startColumn,
+                endColumn: word.endColumn,
+              }
+            },
+            {
+              label: 'contract',
+              kind: monaco.languages.CompletionItemKind.Keyword,
+              insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+              documentation: 'Defines a contract.',
+              insertText: 'contract ${1:ContractName} {\n\t$0\n}',
+              range: {
+                startLineNumber: position.lineNumber,
+                endLineNumber: position.lineNumber,
+                startColumn: word.startColumn,
+                endColumn: word.endColumn,
+              }
+            }
+          ];
+          return { suggestions };
+        },
+      });      
     });
   });
 };
