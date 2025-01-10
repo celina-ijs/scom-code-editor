@@ -7371,6 +7371,60 @@ declare module "@scom/scom-code-editor/editor.api.ts" {
         type MarkupKind = 'plaintext' | 'markdown';
     }
 }
+/// <amd-module name="@scom/scom-code-editor/config/tact.ts" />
+declare module "@scom/scom-code-editor/config/tact.ts" {
+    const _default: {
+        language: {
+            defaultToken: string;
+            tokenPostfix: string;
+            keywords: string[];
+            typeKeywords: string[];
+            operators: string[];
+            brackets: {
+                open: string;
+                close: string;
+                token: string;
+            }[];
+            tokenizer: {
+                root: ((string | RegExp)[] | (RegExp | {
+                    cases: {
+                        '@typeKeywords': string;
+                        '@keywords': string;
+                        '@default': string;
+                    };
+                })[] | (RegExp | {
+                    token: string;
+                    next: string;
+                })[])[];
+                string: ((string | RegExp)[] | (RegExp | {
+                    token: string;
+                    next: string;
+                })[])[];
+            };
+        };
+        config: {
+            comments: {
+                lineComment: string;
+                blockComment: string[];
+            };
+            brackets: string[][];
+            autoClosingPairs: {
+                open: string;
+                close: string;
+            }[];
+            surroundingPairs: {
+                open: string;
+                close: string;
+            }[];
+        };
+    };
+    export default _default;
+}
+/// <amd-module name="@scom/scom-code-editor/config/index.ts" />
+declare module "@scom/scom-code-editor/config/index.ts" {
+    import tact from "@scom/scom-code-editor/config/tact.ts";
+    export { tact };
+}
 /// <amd-module name="@scom/scom-code-editor/monaco.ts" />
 declare module "@scom/scom-code-editor/monaco.ts" {
     import * as IMonaco from "@scom/scom-code-editor/editor.api.ts";
@@ -7524,7 +7578,7 @@ declare module "@scom/scom-code-editor/diff-editor.ts" {
 declare module "@scom/scom-code-editor" {
     export { ScomCodeEditor } from "@scom/scom-code-editor/code-editor.ts";
     export { ScomCodeDiffEditor } from "@scom/scom-code-editor/diff-editor.ts";
-    export { LanguageType } from "@scom/scom-code-editor/monaco.ts";
+    export { LanguageType, getLanguageType } from "@scom/scom-code-editor/monaco.ts";
     import * as Monaco from "@scom/scom-code-editor/editor.api.ts";
     export { Monaco };
 }

@@ -1,5 +1,6 @@
-import { RequireJS, LibPath, application } from "@ijstech/components";
+import { RequireJS, application } from "@ijstech/components";
 import * as IMonaco from "./editor.api";
+import { tact as tactConfig } from "./config/index";
 
 export type LanguageType = "txt" | "css" | "json" | "javascript" | "typescript" | "solidity" | "markdown" | "html" | "xml" | "shell"|'tact';
 
@@ -169,60 +170,10 @@ export async function initMonaco(): Promise<Monaco> {
         }
       });
 
-      monaco.languages.register({
-        id: "tact"
-      });
-
-      monaco.languages.setMonarchTokensProvider('tact', {
-        keywords: [
-          "import", "const", "let", "as", "is", "in", "self", "require", "send", "this",
-          "if", "else", "try", "catch", "repeat", "do", "until", "while", "foreach",
-          "return", "struct", "message", "trait", "contract", "native", "inline", "with",
-          "inline_ref", "extend", "public", "abstract", "virtual", "override", "get", "asm",
-          "mutates", "extends", "fun", "init", "receive", "bounced", "external", "primitive"
-        ],
-        typeKeywords: [
-          'Int', 'Bool', 'Address', 'Cell', 'String', 'StringBuilder', 'Builder', 'Slice'
-        ],
-        tokenizer: {
-          root: [
-            [/[a-z_$][\w$]*/, { cases: { '@typeKeywords': 'keyword', '@keywords': 'keyword', '@default': 'identifier' } }],
-            [/[A-Z][\w\$]*/, 'type.identifier' ],
-            [/\b\d+(\.\d+)?\b/, 'number'],
-            [/"/, { token: 'string.quote', next: '@string' }],
-            [/\/\/.*/, 'comment'],
-            [/[a-zA-Z_][a-zA-Z0-9_]*(?=\s*\()/, 'function']
-          ],
-          string: [
-            [/[^"]+/, 'string'],
-            [/"/, { token: 'string.quote', next: '@pop' }]
-          ]
-        }
-      })
-
-      monaco.languages.setLanguageConfiguration('tact', {
-        comments: {
-          lineComment: '//',
-        },
-        brackets: [
-          ['{', '}'],
-          ['[', ']'],
-          ['(', ')'],
-        ],
-        autoClosingPairs: [
-          { open: '{', close: '}' },
-          { open: '[', close: ']' },
-          { open: '(', close: ')' },
-          { open: '"', close: '"' },
-        ],
-        surroundingPairs: [
-          { open: '{', close: '}' },
-          { open: '[', close: ']' },
-          { open: '(', close: ')' },
-          { open: '"', close: '"' },
-        ],
-      });
-
+      // tact
+      monaco.languages.register({ id: "tact" });
+      monaco.languages.setMonarchTokensProvider('tact', tactConfig.language as IMonaco.languages.IMonarchLanguage);
+      monaco.languages.setLanguageConfiguration('tact', tactConfig.config as IMonaco.languages.LanguageConfiguration);
       monaco.languages.registerCompletionItemProvider('tact', {
         provideCompletionItems: (model: any, position: any) => {
           const word = model.getWordUntilPosition(position);
@@ -256,7 +207,14 @@ export async function initMonaco(): Promise<Monaco> {
           ];
           return { suggestions };
         },
-      });      
+      });
+      
+      // solidity
+      monaco.languages.register({ id: "solidity" });
+      RequireJS.require([`vs/basic-languages/solidity/solidity`], (solidityConfig: any) => {
+        const { language } = solidityConfig;
+        monaco.languages.setMonarchTokensProvider("solidity", language);
+      });
     });
   });
 };

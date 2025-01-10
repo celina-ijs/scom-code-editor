@@ -241,7 +241,86 @@ define("@scom/scom-code-editor/editor.api.ts", ["require", "exports"], function 
         SelectionDirection[SelectionDirection["RTL"] = 1] = "RTL";
     })(SelectionDirection = exports.SelectionDirection || (exports.SelectionDirection = {}));
 });
-define("@scom/scom-code-editor/monaco.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_1) {
+define("@scom/scom-code-editor/config/tact.ts", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    ///<amd-module name='@scom/scom-code-editor/config/tact.ts'/> 
+    exports.default = {
+        language: {
+            defaultToken: '',
+            tokenPostfix: '.tact',
+            keywords: [
+                "import", "const", "let", "as", "is", "in", "self", "require", "send", "this",
+                "if", "else", "try", "catch", "repeat", "do", "until", "while", "foreach",
+                "return", "struct", "message", "trait", "contract", "native", "inline", "with",
+                "inline_ref", "extend", "public", "abstract", "virtual", "override", "get", "asm",
+                "mutates", "extends", "fun", "init", "receive", "bounced", "external", "primitive",
+                "function", "for", "break", "continue", "from", "pragma", "private", "internal",
+                "view", "pure", "payable", "constant", "event", "emit", "constructor"
+            ],
+            typeKeywords: [
+                'Int', 'Bool', 'Address', 'Cell', 'String', 'StringBuilder', 'Builder', 'Slice'
+            ],
+            operators: [
+                '=', '+=', '-=', '*=', '/=', '%=', '==', '!=', '<', '<=', '>', '>=',
+                '&&', '||', '!', '++', '--', '+', '-', '*', '/', '%', '&', '|', '^', '~',
+                '<<', '>>'
+            ],
+            brackets: [
+                { open: '{', close: '}', token: 'delimiter.curly' },
+                { open: '[', close: ']', token: 'delimiter.square' },
+                { open: '(', close: ')', token: 'delimiter.parenthesis' }
+            ],
+            tokenizer: {
+                root: [
+                    [/[a-z_$][\w$]*/, { cases: { '@typeKeywords': 'keyword', '@keywords': 'keyword', '@default': 'identifier' } }],
+                    [/[A-Z][\w\$]*/, 'type.identifier'],
+                    [/\b\d+(\.\d+)?\b/, 'number'],
+                    [/"/, { token: 'string.quote', next: '@string' }],
+                    [/\/\/.*/, 'comment'],
+                    [/[{}()[\]]/, '@brackets'],
+                    [/[=+\-*/%&|^!<>]=?|[~?]/, 'operator'],
+                    [/[a-zA-Z_][a-zA-Z0-9_]*(?=\s*\()/, 'function']
+                ],
+                string: [
+                    [/[^\\"]+/, 'string'],
+                    [/\\./, 'string.escape'],
+                    [/"/, { token: 'string.quote', next: '@pop' }]
+                ]
+            }
+        },
+        config: {
+            comments: {
+                lineComment: '//',
+                blockComment: ['/*', '*/']
+            },
+            brackets: [
+                ['{', '}'],
+                ['[', ']'],
+                ['(', ')']
+            ],
+            autoClosingPairs: [
+                { open: '{', close: '}' },
+                { open: '[', close: ']' },
+                { open: '(', close: ')' },
+                { open: '"', close: '"' }
+            ],
+            surroundingPairs: [
+                { open: '{', close: '}' },
+                { open: '[', close: ']' },
+                { open: '(', close: ')' },
+                { open: '"', close: '"' }
+            ]
+        }
+    };
+});
+define("@scom/scom-code-editor/config/index.ts", ["require", "exports", "@scom/scom-code-editor/config/tact.ts"], function (require, exports, tact_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.tact = void 0;
+    exports.tact = tact_1.default;
+});
+define("@scom/scom-code-editor/monaco.ts", ["require", "exports", "@ijstech/components", "@scom/scom-code-editor/config/index.ts"], function (require, exports, components_1, index_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.initMonaco = exports.addLib = exports.getModels = exports.getFileModel = exports.updateFile = exports.addFile = exports.getLanguageType = void 0;
@@ -406,57 +485,10 @@ define("@scom/scom-code-editor/monaco.ts", ["require", "exports", "@ijstech/comp
                         };
                     }
                 });
-                monaco.languages.register({
-                    id: "tact"
-                });
-                monaco.languages.setMonarchTokensProvider('tact', {
-                    keywords: [
-                        "import", "const", "let", "as", "is", "in", "self", "require", "send", "this",
-                        "if", "else", "try", "catch", "repeat", "do", "until", "while", "foreach",
-                        "return", "struct", "message", "trait", "contract", "native", "inline", "with",
-                        "inline_ref", "extend", "public", "abstract", "virtual", "override", "get", "asm",
-                        "mutates", "extends", "fun", "init", "receive", "bounced", "external", "primitive"
-                    ],
-                    typeKeywords: [
-                        'Int', 'Bool', 'Address', 'Cell', 'String', 'StringBuilder', 'Builder', 'Slice'
-                    ],
-                    tokenizer: {
-                        root: [
-                            [/[a-z_$][\w$]*/, { cases: { '@typeKeywords': 'keyword', '@keywords': 'keyword', '@default': 'identifier' } }],
-                            [/[A-Z][\w\$]*/, 'type.identifier'],
-                            [/\b\d+(\.\d+)?\b/, 'number'],
-                            [/"/, { token: 'string.quote', next: '@string' }],
-                            [/\/\/.*/, 'comment'],
-                            [/[a-zA-Z_][a-zA-Z0-9_]*(?=\s*\()/, 'function']
-                        ],
-                        string: [
-                            [/[^"]+/, 'string'],
-                            [/"/, { token: 'string.quote', next: '@pop' }]
-                        ]
-                    }
-                });
-                monaco.languages.setLanguageConfiguration('tact', {
-                    comments: {
-                        lineComment: '//',
-                    },
-                    brackets: [
-                        ['{', '}'],
-                        ['[', ']'],
-                        ['(', ')'],
-                    ],
-                    autoClosingPairs: [
-                        { open: '{', close: '}' },
-                        { open: '[', close: ']' },
-                        { open: '(', close: ')' },
-                        { open: '"', close: '"' },
-                    ],
-                    surroundingPairs: [
-                        { open: '{', close: '}' },
-                        { open: '[', close: ']' },
-                        { open: '(', close: ')' },
-                        { open: '"', close: '"' },
-                    ],
-                });
+                // tact
+                monaco.languages.register({ id: "tact" });
+                monaco.languages.setMonarchTokensProvider('tact', index_1.tact.language);
+                monaco.languages.setLanguageConfiguration('tact', index_1.tact.config);
                 monaco.languages.registerCompletionItemProvider('tact', {
                     provideCompletionItems: (model, position) => {
                         const word = model.getWordUntilPosition(position);
@@ -490,6 +522,12 @@ define("@scom/scom-code-editor/monaco.ts", ["require", "exports", "@ijstech/comp
                         ];
                         return { suggestions };
                     },
+                });
+                // solidity
+                monaco.languages.register({ id: "solidity" });
+                components_1.RequireJS.require([`vs/basic-languages/solidity/solidity`], (solidityConfig) => {
+                    const { language } = solidityConfig;
+                    monaco.languages.setMonarchTokensProvider("solidity", language);
                 });
             });
         });
@@ -1067,11 +1105,12 @@ define("@scom/scom-code-editor/diff-editor.ts", ["require", "exports", "@ijstech
     exports.ScomCodeDiffEditor = ScomCodeDiffEditor;
     ;
 });
-define("@scom/scom-code-editor", ["require", "exports", "@scom/scom-code-editor/code-editor.ts", "@scom/scom-code-editor/diff-editor.ts", "@scom/scom-code-editor/editor.api.ts"], function (require, exports, code_editor_1, diff_editor_1, Monaco) {
+define("@scom/scom-code-editor", ["require", "exports", "@scom/scom-code-editor/code-editor.ts", "@scom/scom-code-editor/diff-editor.ts", "@scom/scom-code-editor/monaco.ts", "@scom/scom-code-editor/editor.api.ts"], function (require, exports, code_editor_1, diff_editor_1, monaco_3, Monaco) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Monaco = exports.ScomCodeDiffEditor = exports.ScomCodeEditor = void 0;
+    exports.Monaco = exports.getLanguageType = exports.ScomCodeDiffEditor = exports.ScomCodeEditor = void 0;
     Object.defineProperty(exports, "ScomCodeEditor", { enumerable: true, get: function () { return code_editor_1.ScomCodeEditor; } });
     Object.defineProperty(exports, "ScomCodeDiffEditor", { enumerable: true, get: function () { return diff_editor_1.ScomCodeDiffEditor; } });
+    Object.defineProperty(exports, "getLanguageType", { enumerable: true, get: function () { return monaco_3.getLanguageType; } });
     exports.Monaco = Monaco;
 });
