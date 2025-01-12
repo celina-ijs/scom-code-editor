@@ -1,7 +1,8 @@
-import { RequireJS, LibPath, application } from "@ijstech/components";
+import { RequireJS, application } from "@ijstech/components";
 import * as IMonaco from "./editor.api";
+import { tact as tactConfig } from "./config/index";
 
-export type LanguageType = "txt" | "css" | "json" | "javascript" | "typescript" | "solidity" | "markdown" | "html" | "xml" | "shell";
+export type LanguageType = "txt" | "css" | "json" | "javascript" | "typescript" | "solidity" | "markdown" | "html" | "xml" | "shell"|'tact';
 
 export function getLanguageType(fileName: string): LanguageType | undefined {
   let ext = fileName.split('.').pop();
@@ -28,6 +29,8 @@ export function getLanguageType(fileName: string): LanguageType | undefined {
       return 'xml'
     case 'sh':
       return 'shell'
+    case 'tact':
+      return 'tact'
   }
 };
 
@@ -165,6 +168,52 @@ export async function initMonaco(): Promise<Monaco> {
             ]
           };
         }
+      });
+
+      // tact
+      monaco.languages.register({ id: "tact" });
+      monaco.languages.setMonarchTokensProvider('tact', tactConfig.language as IMonaco.languages.IMonarchLanguage);
+      monaco.languages.setLanguageConfiguration('tact', tactConfig.config as IMonaco.languages.LanguageConfiguration);
+      monaco.languages.registerCompletionItemProvider('tact', {
+        provideCompletionItems: (model: any, position: any) => {
+          const word = model.getWordUntilPosition(position);
+          const suggestions = [
+            {
+              label: 'fun',
+              kind: monaco.languages.CompletionItemKind.Keyword,
+              insertText: 'fun ${1:name}(${2:args}) {\n\t$0\n}',
+              insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+              documentation: 'Defines a function.',
+              range: {
+                startLineNumber: position.lineNumber,
+                endLineNumber: position.lineNumber,
+                startColumn: word.startColumn,
+                endColumn: word.endColumn,
+              }
+            },
+            {
+              label: 'contract',
+              kind: monaco.languages.CompletionItemKind.Keyword,
+              insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+              documentation: 'Defines a contract.',
+              insertText: 'contract ${1:ContractName} {\n\t$0\n}',
+              range: {
+                startLineNumber: position.lineNumber,
+                endLineNumber: position.lineNumber,
+                startColumn: word.startColumn,
+                endColumn: word.endColumn,
+              }
+            }
+          ];
+          return { suggestions };
+        },
+      });
+      
+      // solidity
+      monaco.languages.register({ id: "solidity" });
+      RequireJS.require([`vs/basic-languages/solidity/solidity`], (solidityConfig: any) => {
+        const { language } = solidityConfig;
+        monaco.languages.setMonarchTokensProvider("solidity", language);
       });
     });
   });
