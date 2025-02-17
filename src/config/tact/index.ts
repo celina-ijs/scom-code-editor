@@ -1,7 +1,7 @@
-export default {
+import { snippets } from './snippets';
+
+const config = {
   language: {
-    defaultToken: '',
-    tokenPostfix: '.tact',
     keywords: [
       "import", "const", "let", "as", "is", "in", "self", "require", "send", "this",
       "if", "else", "try", "catch", "repeat", "do", "until", "while", "foreach",
@@ -12,7 +12,8 @@ export default {
       "view", "pure", "payable", "constant", "event", "emit", "constructor"
     ],
     typeKeywords: [
-      'Int', 'Bool', 'Address', 'Cell', 'String', 'StringBuilder', 'Builder', 'Slice'
+      'Int', 'Bool', 'Address', 'Cell', 'String', 'StringBuilder', 'Builder', 'Slice',
+      'uint32', 'int64'
     ],
     operators: [
       '=', '+=', '-=', '*=', '/=', '%=', '==', '!=', '<', '<=', '>', '>=',
@@ -65,4 +66,9 @@ export default {
       { open: '"', close: '"' }
     ]
   }
+}
+
+export {
+  config,
+  snippets
 }

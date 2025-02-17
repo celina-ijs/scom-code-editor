@@ -241,14 +241,126 @@ define("@scom/scom-code-editor/editor.api.ts", ["require", "exports"], function 
         SelectionDirection[SelectionDirection["RTL"] = 1] = "RTL";
     })(SelectionDirection = exports.SelectionDirection || (exports.SelectionDirection = {}));
 });
-define("@scom/scom-code-editor/config/tact.ts", ["require", "exports"], function (require, exports) {
+define("@scom/scom-code-editor/config/tact/snippets.ts", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    ///<amd-module name='@scom/scom-code-editor/config/tact.ts'/> 
-    exports.default = {
+    exports.snippets = void 0;
+    ///<amd-module name='@scom/scom-code-editor/config/tact/snippets.ts'/> 
+    exports.snippets = [
+        {
+            label: 'spdx',
+            code: '// SPDX-License-Identifier: MIT',
+            description: 'SPDX License',
+        },
+        {
+            label: 'con',
+            code: 'contract ${1:Name} {\n\t$0\n}',
+            description: 'A template for contract.',
+        },
+        {
+            label: 'imp',
+            code: "import '${1:contract}';",
+            description: 'A template for import contract.',
+        },
+        {
+            label: 'impdep',
+            code: 'import "@stdlib/deploy";',
+            description: 'A template for import deploy.',
+        },
+        {
+            label: 'impown',
+            code: 'import "@stdlib/ownable";',
+            description: 'A template for import ownable.',
+        },
+        {
+            label: 'impstop',
+            code: 'import "@stdlib/stoppable";',
+            description: 'A template for import stoppable.',
+        },
+        {
+            label: 'map',
+            code: 'map<${1:type1}, ${2:type2}>;',
+            description: 'mapping declaration',
+        },
+        {
+            label: 'init',
+            code: 'init () {\n\t$0\n}',
+            description: 'init with 0 param declaration',
+        },
+        {
+            label: 'init1',
+            code: 'init (${1:name}: ${2:type}) {\n\t$0\n}',
+            description: 'init with 1 param declaration',
+        },
+        {
+            label: 'init2',
+            code: 'init (${1:name}: ${2:type}, ${3:name}: ${4:type}) {\n\t$0\n}',
+            description: 'init with 2 param declaration',
+        },
+        {
+            label: 'fun',
+            code: 'fun ${1:name}(${2:name}: ${3:type}) {\n\t$0\n}',
+            description: 'function declaration',
+        },
+        {
+            label: 'funr',
+            code: 'fun ${1:name}(${2:name}: ${3:type}): ${4:type} {\n\t$0\n}',
+            description: 'function return declaration',
+        },
+        {
+            label: 'if',
+            code: 'if (${1:condition}) {\n\t$0\n}',
+            description: 'if statement',
+        },
+        {
+            label: 'ife',
+            code: 'if (${1:condition}) {\n\t$2\n} else {\n\t$0\n}',
+            description: 'if else statement',
+        },
+        {
+            label: 'while',
+            code: 'while (${1:condition}) {\n\t$0\n}',
+            description: 'while statement',
+        },
+        {
+            label: 'until',
+            code: 'do {\n\t$0\n} until (${1:condition});',
+            description: 'until statement',
+        },
+        {
+            label: 'repeat',
+            code: 'repeat(${1:index}) {\n\t$0\n}',
+            description: 'repeat statement',
+        },
+        {
+            label: 'rec',
+            code: 'receive(${1:name}) {\n\t$0\n}',
+            description: 'receive declaration',
+        },
+        {
+            label: 'ctx',
+            code: 'let ctx: Context = context();',
+            description: 'context declaration',
+        },
+        {
+            label: 'doc',
+            code: '//\n/// @notice What does it do?;\n///\n/// @param name - description;\n/// @return Struct - description;',
+            description: 'documentation for function',
+        },
+        {
+            label: 'req',
+            code: 'require(${1:Bool}, ${2:String});',
+            description: 'require expression',
+        },
+    ];
+});
+define("@scom/scom-code-editor/config/tact/index.ts", ["require", "exports", "@scom/scom-code-editor/config/tact/snippets.ts"], function (require, exports, snippets_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.snippets = exports.config = void 0;
+    Object.defineProperty(exports, "snippets", { enumerable: true, get: function () { return snippets_1.snippets; } });
+    const config = {
         language: {
-            defaultToken: '',
-            tokenPostfix: '.tact',
             keywords: [
                 "import", "const", "let", "as", "is", "in", "self", "require", "send", "this",
                 "if", "else", "try", "catch", "repeat", "do", "until", "while", "foreach",
@@ -259,7 +371,8 @@ define("@scom/scom-code-editor/config/tact.ts", ["require", "exports"], function
                 "view", "pure", "payable", "constant", "event", "emit", "constructor"
             ],
             typeKeywords: [
-                'Int', 'Bool', 'Address', 'Cell', 'String', 'StringBuilder', 'Builder', 'Slice'
+                'Int', 'Bool', 'Address', 'Cell', 'String', 'StringBuilder', 'Builder', 'Slice',
+                'uint32', 'int64'
             ],
             operators: [
                 '=', '+=', '-=', '*=', '/=', '%=', '==', '!=', '<', '<=', '>', '>=',
@@ -313,12 +426,84 @@ define("@scom/scom-code-editor/config/tact.ts", ["require", "exports"], function
             ]
         }
     };
+    exports.config = config;
 });
-define("@scom/scom-code-editor/config/index.ts", ["require", "exports", "@scom/scom-code-editor/config/tact.ts"], function (require, exports, tact_1) {
+define("@scom/scom-code-editor/config/func/index.ts", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.tact = void 0;
-    exports.tact = tact_1.default;
+    exports.messageMethods = exports.globalMethods = exports.keywords = exports.config = void 0;
+    ///<amd-module name='@scom/scom-code-editor/config/func/index.ts'/> 
+    const keywords = [
+        "int", "var", "cell", "slice", "builder", "return", "if", "else", "while", "do",
+        "repeat", "continue", "break", "begin", "end", "global", "inline", "asm", "impure",
+        "pure", "forall", "throw"
+    ];
+    exports.keywords = keywords;
+    const config = {
+        language: {
+            keywords,
+            operators: [
+                "=", ">", "<", "!", "~", "?", ":", "==", "<=", ">=", "!=", "&&", "||",
+                "++", "--", "+", "-", "*", "/", "&", "|", "^", "%", "<<", ">>", ">>>"
+            ],
+            brackets: [
+                { open: "{", close: "}", token: "delimiter.curly" },
+                { open: "[", close: "]", token: "delimiter.square" },
+                { open: "(", close: ")", token: "delimiter.parenthesis" }
+            ],
+            tokenizer: {
+                root: [
+                    [/[a-zA-Z_]\w*/, {
+                            cases: {
+                                "@keywords": "keyword",
+                                "@default": "identifier"
+                            }
+                        }],
+                    [/\/\/.*/, "comment"],
+                    [/\/\*/, "comment", "@comment"],
+                    [/"([^"\\]|\\.)*$/, "string.invalid"],
+                    [/"/, "string", "@string"],
+                    [/[{}()\[\]]/, "@brackets"],
+                    [/[<>!=]=?/, "operator"],
+                    [/[\+\-\*/%&|\^~!]/, "operator"],
+                    [/\d+/, "number"]
+                ],
+                comment: [
+                    [/[^\/*]+/, "comment"],
+                    [/\/\*/, "comment", "@push"],
+                    ["\\*/", "comment", "@pop"],
+                    [/[\/*]/, "comment"]
+                ],
+                string: [
+                    [/[^\\"]+/, "string"],
+                    [/\\./, "string.escape"],
+                    [/"/, "string", "@pop"]
+                ]
+            },
+        },
+        config: {
+            comments: {
+                lineComment: ';;',
+                blockComment: ['{-', '-}'],
+            },
+            indentationRules: {
+                decreaseIndentPattern: /^\s*\}.*$/,
+                increaseIndentPattern: /^.*\{[^}]*$/,
+            },
+        }
+    };
+    exports.config = config;
+    const globalMethods = ['get_data', 'set_data', 'begin_cell', 'throw'];
+    exports.globalMethods = globalMethods;
+    const messageMethods = ['recv_internal', 'recv_external'];
+    exports.messageMethods = messageMethods;
+});
+define("@scom/scom-code-editor/config/index.ts", ["require", "exports", "@scom/scom-code-editor/config/tact/index.ts", "@scom/scom-code-editor/config/func/index.ts"], function (require, exports, Tact, Func) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Func = exports.Tact = void 0;
+    exports.Tact = Tact;
+    exports.Func = Func;
 });
 define("@scom/scom-code-editor/monaco.ts", ["require", "exports", "@ijstech/components", "@scom/scom-code-editor/config/index.ts"], function (require, exports, components_1, index_1) {
     "use strict";
@@ -351,6 +536,8 @@ define("@scom/scom-code-editor/monaco.ts", ["require", "exports", "@ijstech/comp
                 return 'shell';
             case 'tact':
                 return 'tact';
+            case 'fc':
+                return 'func';
         }
     }
     exports.getLanguageType = getLanguageType;
@@ -485,49 +672,86 @@ define("@scom/scom-code-editor/monaco.ts", ["require", "exports", "@ijstech/comp
                         };
                     }
                 });
+                monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+                    noSyntaxValidation: true,
+                    noSemanticValidation: true,
+                });
                 // tact
                 monaco.languages.register({ id: "tact" });
-                monaco.languages.setMonarchTokensProvider('tact', index_1.tact.language);
-                monaco.languages.setLanguageConfiguration('tact', index_1.tact.config);
-                monaco.languages.registerCompletionItemProvider('tact', {
-                    provideCompletionItems: (model, position) => {
-                        const word = model.getWordUntilPosition(position);
-                        const suggestions = [
-                            {
-                                label: 'fun',
-                                kind: monaco.languages.CompletionItemKind.Keyword,
-                                insertText: 'fun ${1:name}(${2:args}) {\n\t$0\n}',
-                                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                                documentation: 'Defines a function.',
-                                range: {
-                                    startLineNumber: position.lineNumber,
-                                    endLineNumber: position.lineNumber,
-                                    startColumn: word.startColumn,
-                                    endColumn: word.endColumn,
-                                }
-                            },
-                            {
-                                label: 'contract',
-                                kind: monaco.languages.CompletionItemKind.Keyword,
-                                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                                documentation: 'Defines a contract.',
-                                insertText: 'contract ${1:ContractName} {\n\t$0\n}',
-                                range: {
-                                    startLineNumber: position.lineNumber,
-                                    endLineNumber: position.lineNumber,
-                                    startColumn: word.startColumn,
-                                    endColumn: word.endColumn,
-                                }
-                            }
-                        ];
-                        return { suggestions };
-                    },
-                });
+                monaco.languages.setMonarchTokensProvider('tact', index_1.Tact.config.language);
+                monaco.languages.setLanguageConfiguration('tact', index_1.Tact.config.config);
                 // solidity
                 monaco.languages.register({ id: "solidity" });
                 components_1.RequireJS.require([`vs/basic-languages/solidity/solidity`], (solidityConfig) => {
                     const { language } = solidityConfig;
                     monaco.languages.setMonarchTokensProvider("solidity", language);
+                });
+                // func
+                monaco.languages.register({ id: "func" });
+                monaco.languages.setMonarchTokensProvider('func', index_1.Func.config.language);
+                monaco.languages.setLanguageConfiguration('func', index_1.Func.config.config);
+                monaco.languages.registerCompletionItemProvider('tact', {
+                    provideCompletionItems: (model, position) => {
+                        const word = model.getWordUntilPosition(position);
+                        const range = {
+                            startLineNumber: position.lineNumber,
+                            endLineNumber: position.lineNumber,
+                            startColumn: word.startColumn,
+                            endColumn: word.endColumn,
+                        };
+                        const filteredSnippets = index_1.Tact.snippets.filter((snippet) => snippet.label.startsWith(word.word));
+                        return {
+                            suggestions: filteredSnippets.map((snippet) => {
+                                return {
+                                    label: snippet.label,
+                                    kind: monaco.languages.CompletionItemKind.Snippet,
+                                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                                    insertText: snippet.code,
+                                    documentation: snippet.description || '',
+                                    detail: snippet.description || '',
+                                    range,
+                                };
+                            }),
+                        };
+                    },
+                });
+                monaco.languages.registerCompletionItemProvider('func', {
+                    provideCompletionItems: (model, position) => {
+                        const word = model.getWordUntilPosition(position);
+                        const range = {
+                            startLineNumber: position.lineNumber,
+                            endLineNumber: position.lineNumber,
+                            startColumn: word.startColumn,
+                            endColumn: word.endColumn,
+                        };
+                        const suggestions = [
+                            ...index_1.Func.keywords.map((k) => {
+                                return {
+                                    label: k,
+                                    kind: monaco.languages.CompletionItemKind.Keyword,
+                                    insertText: k,
+                                    range,
+                                };
+                            }),
+                            ...index_1.Func.globalMethods.map((k) => {
+                                return {
+                                    label: k,
+                                    kind: monaco.languages.CompletionItemKind.Function,
+                                    insertText: k,
+                                    range,
+                                };
+                            }),
+                            ...index_1.Func.messageMethods.map((k) => {
+                                return {
+                                    label: k,
+                                    kind: monaco.languages.CompletionItemKind.Function,
+                                    insertText: k,
+                                    range,
+                                };
+                            }),
+                        ];
+                        return { suggestions: suggestions };
+                    }
                 });
             });
         });

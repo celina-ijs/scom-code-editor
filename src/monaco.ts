@@ -1,8 +1,8 @@
 import { RequireJS, application } from "@ijstech/components";
 import * as IMonaco from "./editor.api";
-import { tact as tactConfig } from "./config/index";
+import { Tact, Func } from "./config/index";
 
-export type LanguageType = "txt" | "css" | "json" | "javascript" | "typescript" | "solidity" | "markdown" | "html" | "xml" | "shell"|'tact';
+export type LanguageType = "txt" | "css" | "json" | "javascript" | "typescript" | "solidity" | "markdown" | "html" | "xml" | "shell" | "tact" | "func";
 
 export function getLanguageType(fileName: string): LanguageType | undefined {
   let ext = fileName.split('.').pop();
@@ -31,6 +31,8 @@ export function getLanguageType(fileName: string): LanguageType | undefined {
       return 'shell'
     case 'tact':
       return 'tact'
+    case 'fc':
+      return 'func';
   }
 };
 
@@ -170,50 +172,96 @@ export async function initMonaco(): Promise<Monaco> {
         }
       });
 
+      monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+        noSyntaxValidation: true,
+        noSemanticValidation: true,
+      });
+
       // tact
       monaco.languages.register({ id: "tact" });
-      monaco.languages.setMonarchTokensProvider('tact', tactConfig.language as IMonaco.languages.IMonarchLanguage);
-      monaco.languages.setLanguageConfiguration('tact', tactConfig.config as IMonaco.languages.LanguageConfiguration);
-      monaco.languages.registerCompletionItemProvider('tact', {
-        provideCompletionItems: (model: any, position: any) => {
-          const word = model.getWordUntilPosition(position);
-          const suggestions = [
-            {
-              label: 'fun',
-              kind: monaco.languages.CompletionItemKind.Keyword,
-              insertText: 'fun ${1:name}(${2:args}) {\n\t$0\n}',
-              insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-              documentation: 'Defines a function.',
-              range: {
-                startLineNumber: position.lineNumber,
-                endLineNumber: position.lineNumber,
-                startColumn: word.startColumn,
-                endColumn: word.endColumn,
-              }
-            },
-            {
-              label: 'contract',
-              kind: monaco.languages.CompletionItemKind.Keyword,
-              insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-              documentation: 'Defines a contract.',
-              insertText: 'contract ${1:ContractName} {\n\t$0\n}',
-              range: {
-                startLineNumber: position.lineNumber,
-                endLineNumber: position.lineNumber,
-                startColumn: word.startColumn,
-                endColumn: word.endColumn,
-              }
-            }
-          ];
-          return { suggestions };
-        },
-      });
+      monaco.languages.setMonarchTokensProvider('tact', Tact.config.language as IMonaco.languages.IMonarchLanguage);
+      monaco.languages.setLanguageConfiguration('tact', Tact.config.config as IMonaco.languages.LanguageConfiguration);
       
       // solidity
       monaco.languages.register({ id: "solidity" });
       RequireJS.require([`vs/basic-languages/solidity/solidity`], (solidityConfig: any) => {
         const { language } = solidityConfig;
         monaco.languages.setMonarchTokensProvider("solidity", language);
+      });
+
+      // func
+      monaco.languages.register({ id: "func" });
+      monaco.languages.setMonarchTokensProvider('func', Func.config.language as IMonaco.languages.IMonarchLanguage);
+      monaco.languages.setLanguageConfiguration('func', Func.config.config as IMonaco.languages.LanguageConfiguration);
+
+      monaco.languages.registerCompletionItemProvider('tact', {
+        provideCompletionItems: (model, position) => {
+          const word = model.getWordUntilPosition(position);
+          const range = {
+            startLineNumber: position.lineNumber,
+            endLineNumber: position.lineNumber,
+            startColumn: word.startColumn,
+            endColumn: word.endColumn,
+          };
+
+          const filteredSnippets = Tact.snippets.filter((snippet) =>
+            snippet.label.startsWith(word.word),
+          );
+          return {
+            suggestions: filteredSnippets.map((snippet) => {
+              return {
+                label: snippet.label,
+                kind: monaco.languages.CompletionItemKind.Snippet,
+                insertTextRules:
+                  monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                insertText: snippet.code,
+                documentation: snippet.description || '',
+                detail: snippet.description || '',
+                range,
+              };
+            }),
+          };
+        },
+      });
+    
+      monaco.languages.registerCompletionItemProvider('func', {
+        provideCompletionItems: (model, position) => {
+          const word = model.getWordUntilPosition(position);
+          const range = {
+            startLineNumber: position.lineNumber,
+            endLineNumber: position.lineNumber,
+            startColumn: word.startColumn,
+            endColumn: word.endColumn,
+          };
+          const suggestions = [
+            ...Func.keywords.map((k) => {
+              return {
+                label: k,
+                kind: monaco.languages.CompletionItemKind.Keyword,
+                insertText: k,
+                range,
+              };
+            }),
+            ...Func.globalMethods.map((k) => {
+              return {
+                label: k,
+                kind: monaco.languages.CompletionItemKind.Function,
+                insertText: k,
+                range,
+              };
+            }),
+            ...Func.messageMethods.map((k) => {
+              return {
+                label: k,
+                kind: monaco.languages.CompletionItemKind.Function,
+                insertText: k,
+                range,
+              };
+            }),
+          ];
+    
+          return { suggestions: suggestions };
+        }
       });
     });
   });
