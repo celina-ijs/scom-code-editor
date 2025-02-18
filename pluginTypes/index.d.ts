@@ -7371,12 +7371,19 @@ declare module "@scom/scom-code-editor/editor.api.ts" {
         type MarkupKind = 'plaintext' | 'markdown';
     }
 }
-/// <amd-module name="@scom/scom-code-editor/config/tact.ts" />
-declare module "@scom/scom-code-editor/config/tact.ts" {
-    const _default: {
+/// <amd-module name="@scom/scom-code-editor/config/tact/snippets.ts" />
+declare module "@scom/scom-code-editor/config/tact/snippets.ts" {
+    export const snippets: {
+        label: string;
+        code: string;
+        description: string;
+    }[];
+}
+/// <amd-module name="@scom/scom-code-editor/config/tact/index.ts" />
+declare module "@scom/scom-code-editor/config/tact/index.ts" {
+    import { snippets } from "@scom/scom-code-editor/config/tact/snippets.ts";
+    const config: {
         language: {
-            defaultToken: string;
-            tokenPostfix: string;
             keywords: string[];
             typeKeywords: string[];
             operators: string[];
@@ -7418,17 +7425,56 @@ declare module "@scom/scom-code-editor/config/tact.ts" {
             }[];
         };
     };
-    export default _default;
+    export { config, snippets };
+}
+/// <amd-module name="@scom/scom-code-editor/config/func/index.ts" />
+declare module "@scom/scom-code-editor/config/func/index.ts" {
+    const keywords: string[];
+    const config: {
+        language: {
+            keywords: string[];
+            operators: string[];
+            brackets: {
+                open: string;
+                close: string;
+                token: string;
+            }[];
+            tokenizer: {
+                root: ((string | RegExp)[] | (RegExp | {
+                    cases: {
+                        "@keywords": string;
+                        "@default": string;
+                    };
+                })[])[];
+                comment: (string | RegExp)[][];
+                string: (string | RegExp)[][];
+            };
+        };
+        config: {
+            comments: {
+                lineComment: string;
+                blockComment: string[];
+            };
+            indentationRules: {
+                decreaseIndentPattern: RegExp;
+                increaseIndentPattern: RegExp;
+            };
+        };
+    };
+    const globalMethods: string[];
+    const messageMethods: string[];
+    export { config, keywords, globalMethods, messageMethods };
 }
 /// <amd-module name="@scom/scom-code-editor/config/index.ts" />
 declare module "@scom/scom-code-editor/config/index.ts" {
-    import tact from "@scom/scom-code-editor/config/tact.ts";
-    export { tact };
+    import * as Tact from "@scom/scom-code-editor/config/tact/index.ts";
+    import * as Func from "@scom/scom-code-editor/config/func/index.ts";
+    export { Tact, Func };
 }
 /// <amd-module name="@scom/scom-code-editor/monaco.ts" />
 declare module "@scom/scom-code-editor/monaco.ts" {
     import * as IMonaco from "@scom/scom-code-editor/editor.api.ts";
-    export type LanguageType = "txt" | "css" | "json" | "javascript" | "typescript" | "solidity" | "markdown" | "html" | "xml" | "shell" | 'tact';
+    export type LanguageType = "txt" | "css" | "json" | "javascript" | "typescript" | "solidity" | "markdown" | "html" | "xml" | "shell" | "tact" | "func";
     export function getLanguageType(fileName: string): LanguageType | undefined;
     export interface Monaco {
         MarkerSeverity: typeof IMonaco.MarkerSeverity;

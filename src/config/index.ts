@@ -1,5 +1,7 @@
-import tact from './tact';
+import * as Tact from './tact/index';
+import * as Func from './func/index';
 
 export {
-  tact
+  Tact,
+  Func
 }
