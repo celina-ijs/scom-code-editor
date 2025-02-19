@@ -1079,7 +1079,7 @@ define("@scom/scom-code-editor/code-editor.ts", ["require", "exports", "@ijstech
                 this._editor.getModel()?.dispose();
             }
         }
-        async disposeEditor() {
+        disposeEditor() {
             if (this._editor) {
                 this._editor.getModel()?.dispose();
                 this._editor.dispose();
