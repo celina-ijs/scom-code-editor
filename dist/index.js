@@ -638,9 +638,11 @@ define("@scom/scom-code-editor/monaco.ts", ["require", "exports", "@ijstech/comp
                     moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
                     allowNonTsExtensions: true,
                     target: monaco.languages.typescript.ScriptTarget.ES2020,
+                    noEmit: true,
+                    checkJs: false
                 });
                 //https://stackoverflow.com/questions/57146485/monaco-editor-intellisense-from-multiple-files
-                monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
+                monaco.languages.typescript.typescriptDefaults.setEagerModelSync(false);
                 monaco.languages.registerCompletionItemProvider('typescript', {
                     triggerCharacters: ['>'],
                     provideCompletionItems: (model, position) => {
@@ -671,10 +673,6 @@ define("@scom/scom-code-editor/monaco.ts", ["require", "exports", "@ijstech/comp
                             ]
                         };
                     }
-                });
-                monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
-                    noSyntaxValidation: true,
-                    noSemanticValidation: true,
                 });
                 // tact
                 monaco.languages.register({ id: "tact" });
@@ -969,13 +967,24 @@ define("@scom/scom-code-editor/code-editor.ts", ["require", "exports", "@ijstech
                     ...customOptions
                 };
                 this._editor = monaco.editor.create(captionDiv, options);
-                if (typeof this.onAddAction === 'function') {
-                    this.onAddAction(this._editor);
+                // if (typeof this.onAddAction === 'function') {
+                //   this.onAddAction(this._editor);
+                // }
+                function debounce(func, delay) {
+                    let timer;
+                    return (...args) => {
+                        clearTimeout(timer);
+                        timer = setTimeout(() => func(...args), delay);
+                    };
                 }
-                this._editor.onDidChangeModelContent((event) => {
-                    if (typeof this.onChange === 'function')
-                        this.onChange(this, event);
-                });
+                const handleChange = debounce((event) => {
+                    if (event?.isFlush)
+                        return;
+                    if (typeof this.onChange !== 'function')
+                        return;
+                    this.onChange(this, event);
+                }, 300);
+                this._dispose = this._editor.onDidChangeModelContent(handleChange);
                 this._editor.onKeyDown((event) => {
                     if (typeof this.onKeyDown === 'function') {
                         this.onKeyDown(this, event);
@@ -991,11 +1000,11 @@ define("@scom/scom-code-editor/code-editor.ts", ["require", "exports", "@ijstech
                         this.onMouseDown(this, event);
                     }
                 });
-                this._editor.onContextMenu((event) => {
-                    if (typeof this.onContextMenu === 'function') {
-                        this.onContextMenu(this._editor, event);
-                    }
-                });
+                // this._editor.onContextMenu((event: any) => {
+                //   if (typeof this.onContextMenu === 'function') {
+                //     this.onContextMenu(this._editor as any, event);
+                //   }
+                // });
                 if (fileName) {
                     let model = await (0, monaco_1.getFileModel)(fileName);
                     if (model) {
@@ -1070,17 +1079,16 @@ define("@scom/scom-code-editor/code-editor.ts", ["require", "exports", "@ijstech
                 this._editor.getModel()?.dispose();
             }
         }
-        disposeEditor() {
+        async disposeEditor() {
             if (this._editor) {
                 this._editor.getModel()?.dispose();
                 this._editor.dispose();
-                const domNode = this._editor.getDomNode();
-                if (domNode) {
-                    if (this.contains(domNode))
-                        this.removeChild(domNode);
-                    domNode.remove();
-                }
             }
+            if (this._dispose && this._dispose.dispose) {
+                this._dispose.dispose();
+                this._dispose = null;
+            }
+            this._editor = null;
         }
         scrollToLine(line, column) {
             const topOffset = this._editor.getTopForPosition(line, column);
@@ -1108,6 +1116,19 @@ define("@scom/scom-code-editor/code-editor.ts", ["require", "exports", "@ijstech
     ScomCodeEditor.addFile = monaco_1.addFile;
     ScomCodeEditor.getFileModel = monaco_1.getFileModel;
     ScomCodeEditor.updateFile = monaco_1.updateFile;
+    ScomCodeEditor.close = () => {
+        const monaco = window.monaco;
+        if (!monaco)
+            return;
+        monaco.languages.typescript.getTypeScriptWorker().then(worker => {
+            monaco.editor.getModels().forEach(model => {
+                worker(model.uri).then(client => {
+                    client.dispose();
+                });
+            });
+        });
+        monaco.editor.getModels().forEach(model => model.dispose());
+    };
     ScomCodeEditor = __decorate([
         (0, components_3.customElements)('i-scom-code-editor')
     ], ScomCodeEditor);
