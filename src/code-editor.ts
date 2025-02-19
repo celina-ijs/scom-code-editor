@@ -36,10 +36,27 @@ export class ScomCodeEditor extends Control {
   public onKeyUp: onKeyEventCallback;
   public onAddAction: (editor: IMonaco.editor.IStandaloneCodeEditor) => void;
 
+  private _dispose: any;
+
   public static addLib = addLib;
   public static addFile = addFile;
   public static getFileModel = getFileModel;
   public static updateFile = updateFile;
+
+  public static close = () => {
+    const monaco = (window as any).monaco;
+    if (!monaco) return;
+
+    monaco.languages.typescript.getTypeScriptWorker().then(worker => {
+      monaco.editor.getModels().forEach(model => {
+          worker(model.uri).then(client => {
+            client.dispose();
+          });
+      });
+    });
+
+    monaco.editor.getModels().forEach(model => model.dispose());
+  }
 
   get monaco(): Monaco {
     return (window as any).monaco as Monaco; ``
@@ -152,14 +169,29 @@ export class ScomCodeEditor extends Control {
         },
         ...customOptions
       };
+
       this._editor = monaco.editor.create(captionDiv, options);
-      if (typeof this.onAddAction === 'function') {
-        this.onAddAction(this._editor);
+
+      // if (typeof this.onAddAction === 'function') {
+      //   this.onAddAction(this._editor);
+      // }
+
+      function debounce(func, delay) {
+        let timer: any;
+        return (...args) => {
+          clearTimeout(timer);
+          timer = setTimeout(() => func(...args), delay);
+        };
       }
-      this._editor.onDidChangeModelContent((event: any) => {
-        if (typeof this.onChange === 'function')
-          this.onChange(this, event);
-      });
+
+      const handleChange = debounce((event: any) => {
+        if (event?.isFlush) return;
+        if (typeof this.onChange !== 'function') return;
+        this.onChange(this, event);
+      }, 300);
+
+      this._dispose = this._editor.onDidChangeModelContent(handleChange);
+
       this._editor.onKeyDown((event: any) => {
         if (typeof this.onKeyDown === 'function') {
           this.onKeyDown(this, event);
@@ -175,11 +207,12 @@ export class ScomCodeEditor extends Control {
           this.onMouseDown(this, event);
         }
       });
-      this._editor.onContextMenu((event: any) => {
-        if (typeof this.onContextMenu === 'function') {
-          this.onContextMenu(this._editor as any, event);
-        }
-      });
+      // this._editor.onContextMenu((event: any) => {
+      //   if (typeof this.onContextMenu === 'function') {
+      //     this.onContextMenu(this._editor as any, event);
+      //   }
+      // });
+
       if (fileName) {
         let model = await getFileModel(fileName);
         if (model) {
@@ -257,12 +290,14 @@ export class ScomCodeEditor extends Control {
     if (this._editor) {
       this._editor.getModel()?.dispose();
       this._editor.dispose();
-      const domNode = this._editor.getDomNode();
-      if (domNode) {
-        if (this.contains(domNode)) this.removeChild(domNode);
-        domNode.remove();
-      }
     }
+
+    if (this._dispose && this._dispose.dispose) {
+      this._dispose.dispose();
+      this._dispose = null;
+    }
+
+    this._editor = null;
   }
 
   scrollToLine(line: number, column: number) {

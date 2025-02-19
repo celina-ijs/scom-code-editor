@@ -7535,10 +7535,12 @@ declare module "@scom/scom-code-editor/code-editor.ts" {
         onKeyDown: onKeyEventCallback;
         onKeyUp: onKeyEventCallback;
         onAddAction: (editor: IMonaco.editor.IStandaloneCodeEditor) => void;
+        private _dispose;
         static addLib: typeof addLib;
         static addFile: typeof addFile;
         static getFileModel: typeof getFileModel;
         static updateFile: typeof updateFile;
+        static close: () => void;
         get monaco(): Monaco;
         get editor(): IMonaco.editor.IStandaloneCodeEditor;
         get value(): string;
@@ -7558,7 +7560,7 @@ declare module "@scom/scom-code-editor/code-editor.ts" {
         restoreViewState(state: IMonaco.editor.ICodeEditorViewState): void;
         updateFileName(oldValue: string, newValue: string): Promise<void>;
         dispose(): void;
-        disposeEditor(): void;
+        disposeEditor(): Promise<void>;
         scrollToLine(line: number, column: number): void;
         loadFile(fileName: string): Promise<void>;
         updateOptions(options: IMonaco.editor.IEditorOptions): void;

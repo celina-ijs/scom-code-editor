@@ -132,9 +132,11 @@ export async function initMonaco(): Promise<Monaco> {
         moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
         allowNonTsExtensions: true,
         target: monaco.languages.typescript.ScriptTarget.ES2020,
+        noEmit: true,
+        checkJs: false
       });
       //https://stackoverflow.com/questions/57146485/monaco-editor-intellisense-from-multiple-files
-      monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
+      monaco.languages.typescript.typescriptDefaults.setEagerModelSync(false);
       monaco.languages.registerCompletionItemProvider('typescript', {
         triggerCharacters: ['>'],
         provideCompletionItems: (model: any, position: any) => {
@@ -170,11 +172,6 @@ export async function initMonaco(): Promise<Monaco> {
             ]
           };
         }
-      });
-
-      monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
-        noSyntaxValidation: true,
-        noSemanticValidation: true,
       });
 
       // tact
