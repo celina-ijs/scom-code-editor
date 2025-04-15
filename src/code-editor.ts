@@ -59,7 +59,7 @@ export class ScomCodeEditor extends Control {
   }
 
   get monaco(): Monaco {
-    return (window as any).monaco as Monaco; ``
+    return (window as any).monaco as Monaco;
   }
 
   get editor(): IMonaco.editor.IStandaloneCodeEditor {
@@ -207,6 +207,7 @@ export class ScomCodeEditor extends Control {
           this.onMouseDown(this, event);
         }
       });
+
       // this._editor.onContextMenu((event: any) => {
       //   if (typeof this.onContextMenu === 'function') {
       //     this.onContextMenu(this._editor as any, event);
@@ -251,6 +252,34 @@ export class ScomCodeEditor extends Control {
     this._fileName = fileName || '';
     this._editor.setScrollTop(0);
   };
+
+  executeEditor(type: string, params: any) {
+    if (!this._editor) return;
+    if (type == 'insert') {
+      this.insertTexts(params.textBefore, params.textAfter);
+    }
+  }
+
+  private insertTexts(textBefore: string, textAfter: string) {
+    const selection = this._editor.getSelection();
+    const startLine = selection.startLineNumber;
+    const endLine = selection.endLineNumber;
+
+    const edits = [
+      {
+        range: new this.monaco.Range(startLine, 1, startLine, 1),
+        text: textBefore,
+        forceMoveMarkers: true
+      },
+      {
+        range: new this.monaco.Range(endLine + 1, 1, endLine + 1, 1),
+        text: textAfter,
+        forceMoveMarkers: true
+      }
+    ];
+
+    this._editor.executeEdits('insert-before-after-lines', edits);
+  }
 
   saveViewState() {
     if (this._editor) {

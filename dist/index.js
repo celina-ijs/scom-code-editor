@@ -858,7 +858,6 @@ define("@scom/scom-code-editor/code-editor.ts", ["require", "exports", "@ijstech
     let ScomCodeEditor = class ScomCodeEditor extends components_3.Control {
         get monaco() {
             return window.monaco;
-            ``;
         }
         get editor() {
             return this._editor;
@@ -1048,6 +1047,31 @@ define("@scom/scom-code-editor/code-editor.ts", ["require", "exports", "@ijstech
             this._editor.setScrollTop(0);
         }
         ;
+        executeEditor(type, params) {
+            if (!this._editor)
+                return;
+            if (type == 'insert') {
+                this.insertTexts(params.textBefore, params.textAfter);
+            }
+        }
+        insertTexts(textBefore, textAfter) {
+            const selection = this._editor.getSelection();
+            const startLine = selection.startLineNumber;
+            const endLine = selection.endLineNumber;
+            const edits = [
+                {
+                    range: new this.monaco.Range(startLine, 1, startLine, 1),
+                    text: textBefore,
+                    forceMoveMarkers: true
+                },
+                {
+                    range: new this.monaco.Range(endLine + 1, 1, endLine + 1, 1),
+                    text: textAfter,
+                    forceMoveMarkers: true
+                }
+            ];
+            this._editor.executeEdits('insert-before-after-lines', edits);
+        }
         saveViewState() {
             if (this._editor) {
                 return this._editor.saveViewState();

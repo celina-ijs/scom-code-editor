@@ -7482,6 +7482,7 @@ declare module "@scom/scom-code-editor/monaco.ts" {
         Uri: typeof IMonaco.Uri;
         languages: typeof IMonaco.languages;
         $loaded: boolean;
+        Range: any;
     }
     export function addFile(fileName: string, content: string): Promise<IMonaco.editor.ITextModel | null>;
     export function updateFile(fileName: string, content: string): Promise<IMonaco.editor.ITextModel | null>;
@@ -7556,6 +7557,8 @@ declare module "@scom/scom-code-editor/code-editor.ts" {
         setCursor(line: number, column: number): void;
         getErrors(): IMonaco.editor.IMarker[];
         loadContent(content?: string, language?: LanguageType, fileName?: string): Promise<void>;
+        executeEditor(type: string, params: any): void;
+        private insertTexts;
         saveViewState(): IMonaco.editor.ICodeEditorViewState;
         restoreViewState(state: IMonaco.editor.ICodeEditorViewState): void;
         updateFileName(oldValue: string, newValue: string): Promise<void>;

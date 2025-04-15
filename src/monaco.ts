@@ -42,6 +42,7 @@ export interface Monaco {
   Uri: typeof IMonaco.Uri;
   languages: typeof IMonaco.languages;
   $loaded: boolean;
+  Range: any;
 };
 
 export async function addFile(fileName: string, content: string): Promise<IMonaco.editor.ITextModel | null> {
