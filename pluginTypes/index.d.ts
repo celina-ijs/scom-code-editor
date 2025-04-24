@@ -7510,6 +7510,7 @@ declare module "@scom/scom-code-editor/code-editor.ts" {
     import { ThemeType } from "@scom/scom-code-editor/interface.ts";
     type onChangeCallback = (target: ScomCodeEditor, event: Event) => void;
     type onKeyEventCallback = (target: ScomCodeEditor, event: KeyboardEvent) => void;
+    type onSelectionChangeCallback = (target: ScomCodeEditor, event: any) => void;
     export interface ScomCodeEditorElement extends ControlElement {
         theme?: ThemeType;
         language?: LanguageType;
@@ -7517,6 +7518,7 @@ declare module "@scom/scom-code-editor/code-editor.ts" {
         onKeyDown?: onKeyEventCallback;
         onKeyUp?: onKeyEventCallback;
         onAddAction?: (editor: IMonaco.editor.IStandaloneCodeEditor) => void;
+        onSelectionChange?: onSelectionChangeCallback;
     }
     global {
         namespace JSX {
@@ -7536,6 +7538,7 @@ declare module "@scom/scom-code-editor/code-editor.ts" {
         onKeyDown: onKeyEventCallback;
         onKeyUp: onKeyEventCallback;
         onAddAction: (editor: IMonaco.editor.IStandaloneCodeEditor) => void;
+        onSelectionChange: onSelectionChangeCallback;
         private _dispose;
         static addLib: typeof addLib;
         static addFile: typeof addFile;
@@ -7560,6 +7563,7 @@ declare module "@scom/scom-code-editor/code-editor.ts" {
         executeEditor(type: string, params: any): {
             startLine: number;
             endLine: number;
+            value: string;
         };
         private insertTexts;
         saveViewState(): IMonaco.editor.ICodeEditorViewState;

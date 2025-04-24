@@ -999,11 +999,12 @@ define("@scom/scom-code-editor/code-editor.ts", ["require", "exports", "@ijstech
                         this.onMouseDown(this, event);
                     }
                 });
-                // this._editor.onContextMenu((event: any) => {
-                //   if (typeof this.onContextMenu === 'function') {
-                //     this.onContextMenu(this._editor as any, event);
-                //   }
-                // });
+                const handleSelectionChange = debounce((event) => {
+                    if (typeof this.onSelectionChange === 'function') {
+                        this.onSelectionChange(this, event);
+                    }
+                }, 500);
+                this._editor.onDidChangeCursorSelection(handleSelectionChange);
                 if (fileName) {
                     let model = await (0, monaco_1.getFileModel)(fileName);
                     if (model) {
@@ -1058,20 +1059,25 @@ define("@scom/scom-code-editor/code-editor.ts", ["require", "exports", "@ijstech
             const selection = this._editor.getSelection();
             const startLine = selection.startLineNumber;
             const endLine = selection.endLineNumber;
-            const edits = [
-                {
-                    range: new this.monaco.Range(startLine, 1, startLine, 1),
-                    text: textBefore,
-                    forceMoveMarkers: true
-                },
-                {
-                    range: new this.monaco.Range(endLine + 1, 1, endLine + 1, 1),
-                    text: textAfter,
-                    forceMoveMarkers: true
-                }
-            ];
-            this._editor.executeEdits('insert-before-after-lines', edits);
-            return { startLine, endLine };
+            const value = this._editor.getValue();
+            const lines = value.split('\n');
+            lines.splice(startLine - 1, 0, textBefore);
+            lines.splice(endLine + 1, 0, textAfter);
+            const newValue = lines.join('\n');
+            return { startLine, endLine, value: newValue };
+            // const edits = [
+            //   {
+            //     range: new this.monaco.Range(startLine, 1, startLine, 1),
+            //     text: textBefore,
+            //     forceMoveMarkers: true
+            //   },
+            //   {
+            //     range: new this.monaco.Range(endLine + 1, 1, endLine + 1, 1),
+            //     text: textAfter,
+            //     forceMoveMarkers: true
+            //   }
+            // ];
+            // this._editor.executeEdits('insert-before-after-lines', edits);
         }
         saveViewState() {
             if (this._editor) {
