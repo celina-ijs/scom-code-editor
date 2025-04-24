@@ -6,6 +6,7 @@ import { ThemeType } from "./interface";
 
 type onChangeCallback = (target: ScomCodeEditor, event: Event) => void;
 type onKeyEventCallback = (target: ScomCodeEditor, event: KeyboardEvent) => void;
+type onSelectionChangeCallback = (target: ScomCodeEditor, event: any) => void;
 
 export interface ScomCodeEditorElement extends ControlElement {
   theme?: ThemeType;
@@ -14,6 +15,7 @@ export interface ScomCodeEditorElement extends ControlElement {
   onKeyDown?: onKeyEventCallback;
   onKeyUp?: onKeyEventCallback;
   onAddAction?: (editor: IMonaco.editor.IStandaloneCodeEditor) => void;
+  onSelectionChange?: onSelectionChangeCallback;
 };
 declare global {
   namespace JSX {
@@ -35,6 +37,7 @@ export class ScomCodeEditor extends Control {
   public onKeyDown: onKeyEventCallback;
   public onKeyUp: onKeyEventCallback;
   public onAddAction: (editor: IMonaco.editor.IStandaloneCodeEditor) => void;
+  public onSelectionChange: onSelectionChangeCallback;
 
   private _dispose: any;
 
@@ -175,7 +178,7 @@ export class ScomCodeEditor extends Control {
       // if (typeof this.onAddAction === 'function') {
       //   this.onAddAction(this._editor);
       // }
-
+  
       function debounce(func, delay) {
         let timer: any;
         return (...args) => {
@@ -208,11 +211,12 @@ export class ScomCodeEditor extends Control {
         }
       });
 
-      // this._editor.onContextMenu((event: any) => {
-      //   if (typeof this.onContextMenu === 'function') {
-      //     this.onContextMenu(this._editor as any, event);
-      //   }
-      // });
+      const handleSelectionChange = debounce((event: any) => {
+        if (typeof this.onSelectionChange === 'function') {
+          this.onSelectionChange(this, event);
+        }
+      }, 500);
+      this._editor.onDidChangeCursorSelection(handleSelectionChange);
 
       if (fileName) {
         let model = await getFileModel(fileName);
@@ -264,22 +268,28 @@ export class ScomCodeEditor extends Control {
     const selection = this._editor.getSelection();
     const startLine = selection.startLineNumber;
     const endLine = selection.endLineNumber;
+    const value = this._editor.getValue();
+    const lines = value.split('\n');
+    lines.splice(startLine - 1, 0, textBefore);
+    lines.splice(endLine + 1, 0, textAfter);
+    const newValue = lines.join('\n');
 
-    const edits = [
-      {
-        range: new this.monaco.Range(startLine, 1, startLine, 1),
-        text: textBefore,
-        forceMoveMarkers: true
-      },
-      {
-        range: new this.monaco.Range(endLine + 1, 1, endLine + 1, 1),
-        text: textAfter,
-        forceMoveMarkers: true
-      }
-    ];
+    return { startLine, endLine, value: newValue};
 
-    this._editor.executeEdits('insert-before-after-lines', edits);
-    return { startLine, endLine };
+    // const edits = [
+    //   {
+    //     range: new this.monaco.Range(startLine, 1, startLine, 1),
+    //     text: textBefore,
+    //     forceMoveMarkers: true
+    //   },
+    //   {
+    //     range: new this.monaco.Range(endLine + 1, 1, endLine + 1, 1),
+    //     text: textAfter,
+    //     forceMoveMarkers: true
+    //   }
+    // ];
+
+    // this._editor.executeEdits('insert-before-after-lines', edits);
   }
 
   saveViewState() {
