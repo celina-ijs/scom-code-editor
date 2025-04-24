@@ -7557,7 +7557,10 @@ declare module "@scom/scom-code-editor/code-editor.ts" {
         setCursor(line: number, column: number): void;
         getErrors(): IMonaco.editor.IMarker[];
         loadContent(content?: string, language?: LanguageType, fileName?: string): Promise<void>;
-        executeEditor(type: string, params: any): void;
+        executeEditor(type: string, params: any): {
+            startLine: number;
+            endLine: number;
+        };
         private insertTexts;
         saveViewState(): IMonaco.editor.ICodeEditorViewState;
         restoreViewState(state: IMonaco.editor.ICodeEditorViewState): void;

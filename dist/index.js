@@ -1051,7 +1051,7 @@ define("@scom/scom-code-editor/code-editor.ts", ["require", "exports", "@ijstech
             if (!this._editor)
                 return;
             if (type == 'insert') {
-                this.insertTexts(params.textBefore, params.textAfter);
+                return this.insertTexts(params.textBefore, params.textAfter);
             }
         }
         insertTexts(textBefore, textAfter) {
@@ -1071,6 +1071,7 @@ define("@scom/scom-code-editor/code-editor.ts", ["require", "exports", "@ijstech
                 }
             ];
             this._editor.executeEdits('insert-before-after-lines', edits);
+            return { startLine, endLine };
         }
         saveViewState() {
             if (this._editor) {

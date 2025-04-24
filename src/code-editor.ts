@@ -256,7 +256,7 @@ export class ScomCodeEditor extends Control {
   executeEditor(type: string, params: any) {
     if (!this._editor) return;
     if (type == 'insert') {
-      this.insertTexts(params.textBefore, params.textAfter);
+      return this.insertTexts(params.textBefore, params.textAfter);
     }
   }
 
@@ -279,6 +279,7 @@ export class ScomCodeEditor extends Control {
     ];
 
     this._editor.executeEdits('insert-before-after-lines', edits);
+    return { startLine, endLine };
   }
 
   saveViewState() {
