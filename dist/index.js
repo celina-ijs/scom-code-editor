@@ -1000,8 +1000,9 @@ define("@scom/scom-code-editor/code-editor.ts", ["require", "exports", "@ijstech
                     }
                 });
                 const handleSelectionChange = debounce((event) => {
+                    const selection = event.selection;
                     if (typeof this.onSelectionChange === 'function') {
-                        this.onSelectionChange(this, event);
+                        this.onSelectionChange(this, selection);
                     }
                 }, 500);
                 this._editor.onDidChangeCursorSelection(handleSelectionChange);
@@ -1051,7 +1052,7 @@ define("@scom/scom-code-editor/code-editor.ts", ["require", "exports", "@ijstech
         executeEditor(type, params) {
             if (!this._editor)
                 return;
-            if (type == 'insert') {
+            if (type === 'insert') {
                 return this.insertTexts(params.textBefore, params.textAfter);
             }
         }
@@ -1078,6 +1079,19 @@ define("@scom/scom-code-editor/code-editor.ts", ["require", "exports", "@ijstech
             //   }
             // ];
             // this._editor.executeEdits('insert-before-after-lines', edits);
+        }
+        addWidget(widget) {
+            if (this._editor) {
+                this._editor.addContentWidget(widget);
+            }
+        }
+        updateWidget(widget) {
+            if (this._editor) {
+                this._editor.layoutContentWidget(widget);
+            }
+        }
+        getContentWidgetPosition() {
+            return this.monaco.editor.ContentWidgetPositionPreference;
         }
         saveViewState() {
             if (this._editor) {
