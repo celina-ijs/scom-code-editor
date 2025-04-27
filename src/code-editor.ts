@@ -6,7 +6,7 @@ import { ThemeType } from "./interface";
 
 type onChangeCallback = (target: ScomCodeEditor, event: Event) => void;
 type onKeyEventCallback = (target: ScomCodeEditor, event: KeyboardEvent) => void;
-type onSelectionChangeCallback = (target: ScomCodeEditor, event: any) => void;
+type onSelectionChangeCallback = (target: ScomCodeEditor, selection: any) => void;
 
 export interface ScomCodeEditorElement extends ControlElement {
   theme?: ThemeType;
@@ -212,8 +212,9 @@ export class ScomCodeEditor extends Control {
       });
 
       const handleSelectionChange = debounce((event: any) => {
+        const selection = event.selection;
         if (typeof this.onSelectionChange === 'function') {
-          this.onSelectionChange(this, event);
+          this.onSelectionChange(this, selection);
         }
       }, 500);
       this._editor.onDidChangeCursorSelection(handleSelectionChange);
@@ -259,7 +260,7 @@ export class ScomCodeEditor extends Control {
 
   executeEditor(type: string, params: any) {
     if (!this._editor) return;
-    if (type == 'insert') {
+    if (type === 'insert') {
       return this.insertTexts(params.textBefore, params.textAfter);
     }
   }
@@ -290,6 +291,22 @@ export class ScomCodeEditor extends Control {
     // ];
 
     // this._editor.executeEdits('insert-before-after-lines', edits);
+  }
+
+  addWidget(widget: IMonaco.editor.IContentWidget) {
+    if (this._editor) {
+      this._editor.addContentWidget(widget);
+    }
+  }
+
+  updateWidget(widget: IMonaco.editor.IContentWidget) {
+    if (this._editor) {
+      this._editor.layoutContentWidget(widget);
+    }
+  }
+
+  getContentWidgetPosition() {
+    return this.monaco.editor.ContentWidgetPositionPreference;
   }
 
   saveViewState() {

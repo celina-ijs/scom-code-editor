@@ -7510,7 +7510,7 @@ declare module "@scom/scom-code-editor/code-editor.ts" {
     import { ThemeType } from "@scom/scom-code-editor/interface.ts";
     type onChangeCallback = (target: ScomCodeEditor, event: Event) => void;
     type onKeyEventCallback = (target: ScomCodeEditor, event: KeyboardEvent) => void;
-    type onSelectionChangeCallback = (target: ScomCodeEditor, event: any) => void;
+    type onSelectionChangeCallback = (target: ScomCodeEditor, selection: any) => void;
     export interface ScomCodeEditorElement extends ControlElement {
         theme?: ThemeType;
         language?: LanguageType;
@@ -7566,6 +7566,9 @@ declare module "@scom/scom-code-editor/code-editor.ts" {
             value: string;
         };
         private insertTexts;
+        addWidget(widget: IMonaco.editor.IContentWidget): void;
+        updateWidget(widget: IMonaco.editor.IContentWidget): void;
+        getContentWidgetPosition(): typeof IMonaco.editor.ContentWidgetPositionPreference;
         saveViewState(): IMonaco.editor.ICodeEditorViewState;
         restoreViewState(state: IMonaco.editor.ICodeEditorViewState): void;
         updateFileName(oldValue: string, newValue: string): Promise<void>;
