@@ -1053,17 +1053,30 @@ define("@scom/scom-code-editor/code-editor.ts", ["require", "exports", "@ijstech
             if (!this._editor)
                 return;
             if (type === 'insert') {
-                return this.insertTexts(params.textBefore, params.textAfter);
+                return this.insertTexts(params.textBefore, params.textAfter, params.oldLines);
             }
         }
-        insertTexts(textBefore, textAfter) {
+        insertTexts(textBefore, textAfter, oldLines) {
             const selection = this._editor.getSelection();
-            const startLine = selection.startLineNumber;
+            const startLine = selection.startLineNumber - 1;
             const endLine = selection.endLineNumber;
             const value = this._editor.getValue();
             const lines = value.split('\n');
-            lines.splice(startLine - 1, 0, textBefore);
-            lines.splice(endLine + 1, 0, textAfter);
+            let formattedLines = [];
+            oldLines.push({ startLine, endLine });
+            for (let i = 0; i < oldLines.length; i++) {
+                formattedLines.push({ type: 'start', line: +oldLines[i].startLine });
+                formattedLines.push({ type: 'end', line: +oldLines[i].endLine });
+            }
+            formattedLines.sort((a, b) => a.line - b.line);
+            let offset = 0;
+            for (let i = 0; i < formattedLines.length; i++) {
+                const { type, line } = formattedLines[i];
+                const insertPos = line + offset;
+                const text = type === 'start' ? `${textBefore}{Line-${line}}` : `${textAfter}{Line-${line}}`;
+                lines.splice(insertPos, 0, text);
+                ++offset;
+            }
             const newValue = lines.join('\n');
             return { startLine, endLine, value: newValue };
             // const edits = [
