@@ -1,8 +1,7 @@
 {
     "name": "@scom/scom-code-editor",
     "type": "widget",
-    "hash": "sha256-ZxMsYyRKo36eDNEgJAp2VVrvY0S64mNB4+HE/i6lCrk=",
-    "version": "0.1.9",
+    "version": "0.1.10",
     "dependencies": [
         "@ijstech/components"
     ]
