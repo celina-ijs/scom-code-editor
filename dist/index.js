@@ -1001,7 +1001,8 @@ define("@scom/scom-code-editor/code-editor.ts", ["require", "exports", "@ijstech
                 });
                 const handleSelectionChange = debounce((event) => {
                     const selection = event.selection;
-                    if (typeof this.onSelectionChange === 'function') {
+                    const isEmpty = selection.isEmpty();
+                    if (typeof this.onSelectionChange === 'function' && !isEmpty) {
                         this.onSelectionChange(this, selection);
                     }
                 }, 500);

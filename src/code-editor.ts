@@ -213,7 +213,8 @@ export class ScomCodeEditor extends Control {
 
       const handleSelectionChange = debounce((event: any) => {
         const selection = event.selection;
-        if (typeof this.onSelectionChange === 'function') {
+        const isEmpty = selection.isEmpty();
+        if (typeof this.onSelectionChange === 'function' && !isEmpty) {
           this.onSelectionChange(this, selection);
         }
       }, 500);
